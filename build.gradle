@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.nazgulcz'
+version = '4.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+dependencies {
+    // JUnit 6 for testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:6.0.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:6.0.0'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
