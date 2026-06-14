@@ -20,9 +20,11 @@ public class Main {
     public static void main(String[] args) {
         try {
             CliArgs cliArgs = CliArgs.parse(args);
+
+            Scanner scanner = new Scanner(System.in);
             
-            Path routeFile = getRoutePath(cliArgs);
-            Path waypointFile = getWaypointPath(cliArgs);
+            Path routeFile = getRoutePath(cliArgs, scanner);
+            Path waypointFile = getWaypointPath(cliArgs, scanner);
             Path outputFile = getOutputPath(cliArgs);
             double radius = cliArgs.getRadius();
 
@@ -64,36 +66,32 @@ public class Main {
         }
     }
 
-    private static Path getRoutePath(CliArgs cliArgs) throws CliException {
+    private static Path getRoutePath(CliArgs cliArgs, Scanner scanner) throws CliException {
         Path routeFile = cliArgs.getRouteFile();
         if (routeFile != null) {
             return routeFile;
         }
 
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Enter route file path (required): ");
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty()) {
-                throw new CliException("Route file path cannot be empty");
-            }
-            return Paths.get(input);
+        System.out.print("Enter route file path (required): ");
+        String input = scanner.nextLine().trim();
+        if (input.isEmpty()) {
+            throw new CliException("Route file path cannot be empty");
         }
+        return Paths.get(input);
     }
 
-    private static Path getWaypointPath(CliArgs cliArgs) throws CliException {
+    private static Path getWaypointPath(CliArgs cliArgs, Scanner scanner) throws CliException {
         Path waypointFile = cliArgs.getWaypointFile();
         if (waypointFile != null) {
             return waypointFile;
         }
 
-        try (Scanner scanner = new Scanner(System.in)) {
-            System.out.print("Enter waypoint file path (required): ");
-            String input = scanner.nextLine().trim();
-            if (input.isEmpty()) {
-                throw new CliException("Waypoint file path cannot be empty");
-            }
-            return Paths.get(input);
+        System.out.print("Enter waypoint file path (required): ");
+        String input = scanner.nextLine().trim();
+        if (input.isEmpty()) {
+            throw new CliException("Waypoint file path cannot be empty");
         }
+        return Paths.get(input);
     }
 
     private static Path getOutputPath(CliArgs cliArgs) {

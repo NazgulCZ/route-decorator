@@ -1,5 +1,8 @@
 package com.nazgulcz.routedecorator.cli;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+
 import com.nazgulcz.routedecorator.cli.gpx.*;
 import com.nazgulcz.routedecorator.model.Point;
 import com.nazgulcz.routedecorator.model.Route;
@@ -79,6 +82,7 @@ public class GpxParser {
     private static GpxDocument unmarshal(Path filePath) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(GpxDocument.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
+        unmarshaller.setEventHandler(event -> true);
         return (GpxDocument) unmarshaller.unmarshal(filePath.toFile());
     }
 

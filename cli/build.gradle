@@ -17,7 +17,10 @@ java {
 
 dependencies {
     implementation project(':core')
-    
+
+    compileOnly 'org.projectlombok:lombok:1.18.46'
+    annotationProcessor 'org.projectlombok:lombok:1.18.46'
+
     // JAXB for XML parsing
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     runtimeOnly 'com.sun.xml.bind:jaxb-impl:4.0.2'
@@ -25,4 +28,8 @@ dependencies {
 
 application {
     mainClass = 'com.nazgulcz.routedecorator.cli.Main'
+}
+
+run {
+    standardInput = System.in
 }
