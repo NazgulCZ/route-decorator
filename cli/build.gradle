@@ -33,3 +33,25 @@ application {
 run {
     standardInput = System.in
 }
+
+// Create a fat JAR with all dependencies
+task fatJar(type: Jar) {
+    archiveBaseName = 'route-decorator'
+    archiveVersion = version
+    archiveClassifier = ''
+    manifest {
+        attributes 'Main-Class': application.mainClass
+    }
+    from sourceSets.main.output
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll { it.canBeConvertedToPath() }.map { zipTree(it) }
+    }
+    // Exclude duplicate metadata
+    exclude 'META-INF/maven/**', 'META-INF/LICENSE*', 'META-INF/NOTICE*'
+}
+
+// Make fatJar the default build artifact
+artifacts {
+    archives fatJar
+}
