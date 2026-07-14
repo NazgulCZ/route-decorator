@@ -61,7 +61,7 @@ public class RouteDecorator {
     }
 
     /**
-     * Add a hexagon around a waypoint to the route.
+     * Add a hexagon around a waypoint to the route at the appropriate position.
      */
     private void addHexagonToRoute(Route route, Waypoint waypoint) {
         Point nearestPointOnRoute = GeometryUtils.findNearestPointOnPolyline(
@@ -69,9 +69,40 @@ public class RouteDecorator {
                 route.getPoints()
         );
 
+        // Find the index where the hexagon should be inserted
+        int insertionIndex = findInsertionIndex(route.getPoints(), nearestPointOnRoute, waypoint.getPoint());
+
         List<Point> hexagonPoints = GeometryUtils.generateHexagon(nearestPointOnRoute, polygonRadiusInMeters);
-        for (Point hexPoint : hexagonPoints) {
-            route.addPoint(hexPoint);
+        
+        // Insert hexagon points at the correct position
+        for (int i = 0; i < hexagonPoints.size(); i++) {
+            route.getPoints().add(insertionIndex + i, hexagonPoints.get(i));
         }
+    }
+
+    /**
+     * Find the index in the route where the hexagon should be inserted.
+     * The hexagon is inserted after the segment that contains the nearest point.
+     */
+    private int findInsertionIndex(List<Point> routePoints, Point nearestPoint, Point waypoint) {
+        double minDistance = Double.MAX_VALUE;
+        int segmentIndex = 0;
+
+        // Find which segment the nearest point is closest to
+        for (int i = 0; i < routePoints.size() - 1; i++) {
+            Point segmentStart = routePoints.get(i);
+            Point segmentEnd = routePoints.get(i + 1);
+
+            Point closestPointOnSegment = GeometryUtils.findNearestPointOnSegment(waypoint, segmentStart, segmentEnd);
+            double distance = waypoint.distanceTo(closestPointOnSegment);
+
+            if (distance < minDistance) {
+                minDistance = distance;
+                segmentIndex = i;
+            }
+        }
+
+        // Insert after the end of the segment
+        return segmentIndex + 1;
     }
 }

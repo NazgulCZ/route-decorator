@@ -61,7 +61,7 @@ public class GeometryUtils {
      * @param segmentEnd the end of the line segment
      * @return the nearest point on the segment
      */
-    private static Point findNearestPointOnSegment(Point point, Point segmentStart, Point segmentEnd) {
+    public static Point findNearestPointOnSegment(Point point, Point segmentStart, Point segmentEnd) {
         double dx = segmentEnd.getLongitude() - segmentStart.getLongitude();
         double dy = segmentEnd.getLatitude() - segmentStart.getLatitude();
 
