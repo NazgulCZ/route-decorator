@@ -21,10 +21,10 @@ public class RouteDecorator {
     private double polygonRadiusInMeters;
 
     /**
-     * Create a RouteDecorator with default polygon radius of 10 meters.
+     * Create a RouteDecorator with default polygon radius of 20 meters.
      */
     public RouteDecorator() {
-        this(10.0);
+        this(20.0);
     }
 
     /**
