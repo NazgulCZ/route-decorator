@@ -84,12 +84,12 @@ public class GeometryUtils {
     }
 
     /**
-     * Generate a hexagon around a center point with the given radius (in meters).
-     * Note: This uses a simplified approach treating coordinates as Cartesian.
+     * Generate a regular hexagon around a center point with the given radius (in meters).
+     * Uses equidistant points from the center to form a regular hexagon.
      *
      * @param center the center point
-     * @param radiusInMeters the radius of the hexagon in meters
-     * @return a list of points forming a hexagon
+     * @param radiusInMeters the radius of the hexagon in meters (distance from center to each vertex)
+     * @return a list of 7 points forming a closed hexagon (first point is repeated at the end)
      */
     public static List<Point> generateHexagon(Point center, double radiusInMeters) {
         Objects.requireNonNull(center, "Center cannot be null");
@@ -98,20 +98,28 @@ public class GeometryUtils {
         }
 
         List<Point> hexagon = new ArrayList<>();
-        double radianToDegree = 1.0 / 111000.0; // Approximate conversion factor (1 degree ≈ 111 km)
-        double radiusInDegrees = radiusInMeters * radianToDegree;
+        
+        // Conversion factor: 1 degree latitude ≈ 111 km
+        // For longitude, we adjust by the cosine of the latitude to account for convergence at poles
+        double radiusInDegreesLat = radiusInMeters / 111000.0;
+        double radiusInDegreesLon = radiusInDegreesLat / Math.cos(Math.toRadians(center.getLatitude()));
 
-        // Generate 6 vertices of a regular hexagon
+        // Generate 6 vertices of a regular hexagon, starting from the north (top) and going clockwise
         for (int i = 0; i < 6; i++) {
             double angle = (i * 60) * Math.PI / 180.0; // 60 degrees apart
-            double offsetLat = radiusInDegrees * Math.sin(angle);
-            double offsetLon = radiusInDegrees * Math.cos(angle);
+            
+            // Calculate offsets using sin and cos relative to the north direction
+            double offsetLat = radiusInDegreesLat * Math.cos(angle);
+            double offsetLon = radiusInDegreesLon * Math.sin(angle);
 
             double lat = center.getLatitude() + offsetLat;
             double lon = center.getLongitude() + offsetLon;
 
             hexagon.add(new Point(lat, lon, center.getElevation()));
         }
+
+        // Add the first point again to close the hexagon
+        hexagon.add(hexagon.get(0));
 
         return hexagon;
     }
