@@ -45,7 +45,7 @@ task fatJar(type: Jar) {
     from sourceSets.main.output
     dependsOn configurations.runtimeClasspath
     from {
-        configurations.runtimeClasspath.findAll { it.canBeConvertedToPath() }.map { zipTree(it) }
+        configurations.runtimeClasspath.findAll { it.isFile() }.map { zipTree(it) }
     }
     // Exclude duplicate metadata
     exclude 'META-INF/maven/**', 'META-INF/LICENSE*', 'META-INF/NOTICE*'
