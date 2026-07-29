@@ -16,6 +16,7 @@ public class CliArgs {
     private Path waypointFile;
     private Path outputFile;
     private double radius;
++    private String waypointSelection; // New: selection string or null
 
     private CliArgs() {
         this.radius = DEFAULT_RADIUS;
@@ -37,6 +38,9 @@ public class CliArgs {
             } else if (arg.equals("--waypoint-file") || arg.equals("-wf")) {
                 cliArgs.waypointFile = parsePathArg(args, i, "--waypoint-file");
                 i++;
++            } else if (arg.equals("--waypoints") || arg.equals("-w")) {
++                cliArgs.waypointSelection = parseStringArg(args, i, "--waypoints");
++                i++;
             } else if (arg.equals("--output-file") || arg.equals("-of")) {
                 cliArgs.outputFile = parsePathArg(args, i, "--output-file");
                 i++;
@@ -57,15 +61,26 @@ public class CliArgs {
         }
         return Paths.get(args[index + 1]);
     }
-
-    private static double parseRadiusArg(String[] args, int index) throws CliException {
-        if (index + 1 >= args.length) {
-            throw new CliException("--radius requires a value");
-        }
-        try {
-            return Double.parseDouble(args[index + 1]);
-        } catch (NumberFormatException e) {
-            throw new CliException("--radius must be a valid number: " + args[index + 1]);
-        }
-    }
-}
++
++    private static String parseStringArg(String[] args, int index, String argName) throws CliException {
++        if (index + 1 >= args.length) {
++            throw new CliException(argName + " requires a value");
++        }
++        return args[index + 1];
++    }
++
+     private static double parseRadiusArg(String[] args, int index) throws CliException {
+         if (index + 1 >= args.length) {
+             throw new CliException("--radius requires a value");
+         }
+         try {
+             return Double.parseDouble(args[index + 1]);
+         } catch (NumberFormatException e) {
+             throw new CliException("--radius must be a valid number: " + args[index + 1]);
+         }
+     }
++
++    public String getWaypointSelection() {
++        return waypointSelection;
++    }
+ }
