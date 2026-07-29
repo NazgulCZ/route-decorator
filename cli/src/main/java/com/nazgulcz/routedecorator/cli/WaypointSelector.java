@@ -5,47 +5,31 @@ import java.util.stream.Collectors;
 
 /**
  * Parses a user-provided waypoint selection string like "1,2,5-10" and
- * returns the list of 0-based indices to process. If the selection means
- * "all" waypoints, returns Optional.empty().
+ * returns the list of 0-based indices to process. An empty list indicates "all".
  */
 public final class WaypointSelector {
 
-    private WaypointSelector() {
-        // Utility class
-    }
+    private WaypointSelector() {}
 
-    /**
-     * Parse the selection string.
-     *
-     * @param selection the user selection string, may be null
-     * @param waypointCount total number of available waypoints
-     * @return Optional.empty() to indicate "all" waypoints, or Optional.of(list)
-     *         with the 0-based indices to process (sorted ascending, no duplicates)
-     */
-    public static Optional<List<Integer>> parseSelection(String selection, int waypointCount) {
+    public static List<Integer> parseSelection(String selection, int waypointCount) {
         if (selection == null) {
-            return Optional.empty();
+            return Collections.emptyList();
         }
 
         String trimmed = selection.trim();
-        if (trimmed.isEmpty()) {
-            return Optional.empty();
-        }
-
-        if (trimmed.equalsIgnoreCase("all")) {
-            return Optional.empty();
+        if (trimmed.isEmpty() || trimmed.equalsIgnoreCase("all")) {
+            return Collections.emptyList();
         }
 
         String[] tokens = trimmed.split(",");
-        Set<Integer> indices = new LinkedHashSet<>(); // preserve insertion order for deterministic warnings
+        Set<Integer> indices = new LinkedHashSet<>();
         for (String rawToken : tokens) {
             String token = rawToken.trim();
             if (token.isEmpty()) {
-                continue; // silence for empty parts
+                continue;
             }
 
             if (token.contains("-")) {
-                // Range
                 String[] parts = token.split("-");
                 if (parts.length != 2) {
                     System.err.println("Invalid token ignored: " + token);
@@ -60,7 +44,6 @@ public final class WaypointSelector {
                         System.err.println("Invalid range (start>end) ignored: " + token);
                         continue;
                     }
-                    // convert 1-based to 0-based, validate bounds
                     if (end < 1 || start > waypointCount) {
                         System.err.println("Range out of bounds ignored: " + token);
                         continue;
@@ -74,7 +57,6 @@ public final class WaypointSelector {
                     System.err.println("Invalid token ignored: " + token);
                 }
             } else {
-                // Single integer
                 try {
                     int idx = Integer.parseInt(token);
                     if (idx < 1 || idx > waypointCount) {
@@ -89,12 +71,9 @@ public final class WaypointSelector {
         }
 
         if (indices.isEmpty()) {
-            // Per requirement: empty/invalid selection -> treat as "all"
-            return Optional.empty();
+            return Collections.emptyList();
         }
 
-        // Return sorted list in ascending order (GPX order)
-        List<Integer> result = indices.stream().sorted().collect(Collectors.toList());
-        return Optional.of(result);
+        return indices.stream().sorted().collect(Collectors.toList());
     }
 }
