@@ -7,12 +7,11 @@ import com.nazgulcz.routedecorator.model.Waypoint;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
-/**
- * Main entry point for the Route Decorator CLI application.
- */
 public class Main {
     private static final String DEFAULT_OUTPUT_FILE = "output.gpx";
     private static final double DEFAULT_RADIUS = -1.0; // Indicates use RouteDecorator's default
@@ -48,11 +47,13 @@ public class Main {
                 error("Waypoint file does not contain any valid waypoints");
             }
 
+            List<Waypoint> toProcess = selectWaypoints(waypoints, cliArgs, scanner);
+
             // Decorate route
             RouteDecorator decorator = radius == DEFAULT_RADIUS 
                 ? new RouteDecorator() 
                 : new RouteDecorator(radius);
-            Route decoratedRoute = decorator.decorate(route, waypoints);
+            Route decoratedRoute = decorator.decorate(route, toProcess);
 
             // Write output
             GpxWriter.write(decoratedRoute, outputFile);
@@ -64,6 +65,36 @@ public class Main {
             error("Unexpected error: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private static List<Waypoint> selectWaypoints(List<Waypoint> waypoints, CliArgs cliArgs, Scanner scanner) {
+        String selection = cliArgs.getWaypointSelection();
+        if (selection == null) {
+            System.out.println("Waypoints:");
+            for (int i = 0; i < waypoints.size(); i++) {
+                Waypoint wp = waypoints.get(i);
+                System.out.println((i + 1) + ". " + wp.getName());
+            }
+
+            System.out.print("Enter waypoints to process (e.g. 1,2,5-10) or press Enter for all: ");
+            selection = scanner.nextLine();
+        } else {
+            if (selection.equalsIgnoreCase("all")) {
+                selection = "";
+            }
+            // when passed via CLI, do not print the list or prompt
+        }
+
+        List<Integer> indices = WaypointSelector.parseSelection(selection, waypoints.size());
+        if (indices.isEmpty()) {
+            return waypoints; // treat as all
+        }
+
+        List<Waypoint> toProcess = new ArrayList<>();
+        for (int idx : indices) {
+            toProcess.add(waypoints.get(idx));
+        }
+        return toProcess;
     }
 
     private static Path getRoutePath(CliArgs cliArgs, Scanner scanner) throws CliException {
