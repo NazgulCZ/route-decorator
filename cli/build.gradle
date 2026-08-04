@@ -24,6 +24,10 @@ dependencies {
     // JAXB for XML parsing
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     runtimeOnly 'com.sun.xml.bind:jaxb-impl:4.0.2'
+
+    // JUnit for testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:6.1.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:6.1.0'
 }
 
 application {
@@ -54,4 +58,9 @@ task fatJar(type: Jar) {
 // Make fatJar the default build artifact
 artifacts {
     archives fatJar
+}
+
+// Enable junit platform for tests
+test {
+    useJUnitPlatform()
 }
