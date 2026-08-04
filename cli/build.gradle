@@ -41,10 +41,9 @@ run {
 // Create a fat JAR with all dependencies
 // Use collect instead of map for compatibility with the Gradle/Groovy runtime
 // Exclude duplicate entries (module-info.class etc.) to avoid copy conflicts
-import org.gradle.api.tasks.Sync.DuplicatesStrategy
-
 task fatJar(type: Jar) {
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    // use fully qualified enum to avoid needing an import
+    duplicatesStrategy = org.gradle.api.file.DuplicatesStrategy.EXCLUDE
     archiveBaseName = 'route-decorator'
     archiveVersion = version
     archiveClassifier = ''
