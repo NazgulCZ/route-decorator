@@ -39,6 +39,7 @@ run {
 }
 
 // Create a fat JAR with all dependencies
+// Use collect instead of map for compatibility with the Gradle/Groovy runtime
 task fatJar(type: Jar) {
     archiveBaseName = 'route-decorator'
     archiveVersion = version
@@ -49,7 +50,7 @@ task fatJar(type: Jar) {
     from sourceSets.main.output
     dependsOn configurations.runtimeClasspath
     from {
-        configurations.runtimeClasspath.findAll { it.isFile() }.map { zipTree(it) }
+        configurations.runtimeClasspath.findAll { it.isFile() }.collect { zipTree(it) }
     }
     // Exclude duplicate metadata
     exclude 'META-INF/maven/**', 'META-INF/LICENSE*', 'META-INF/NOTICE*'
