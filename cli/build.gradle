@@ -40,7 +40,11 @@ run {
 
 // Create a fat JAR with all dependencies
 // Use collect instead of map for compatibility with the Gradle/Groovy runtime
+// Exclude duplicate entries (module-info.class etc.) to avoid copy conflicts
+import org.gradle.api.tasks.Sync.DuplicatesStrategy
+
 task fatJar(type: Jar) {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveBaseName = 'route-decorator'
     archiveVersion = version
     archiveClassifier = ''
@@ -52,8 +56,8 @@ task fatJar(type: Jar) {
     from {
         configurations.runtimeClasspath.findAll { it.isFile() }.collect { zipTree(it) }
     }
-    // Exclude duplicate metadata
-    exclude 'META-INF/maven/**', 'META-INF/LICENSE*', 'META-INF/NOTICE*'
+    // Exclude duplicate metadata and module descriptors
+    exclude 'META-INF/maven/**', 'META-INF/LICENSE*', 'META-INF/NOTICE*', '**/module-info.class', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
 }
 
 // Make fatJar the default build artifact
