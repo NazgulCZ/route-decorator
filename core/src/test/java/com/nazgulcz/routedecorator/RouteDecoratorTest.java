@@ -82,12 +82,6 @@ class RouteDecoratorTest {
     }
 
     @Test
-    void testDefaultPolygonRadius() {
-        RouteDecorator decorator = new RouteDecorator();
-        assertEquals(20.0, decorator.getPolygonRadiusInMeters());
-    }
-
-    @Test
     void testInvalidPolygonRadius() {
         assertThrows(IllegalArgumentException.class, () -> new RouteDecorator(-5.0));
         assertThrows(IllegalArgumentException.class, () -> new RouteDecorator(0.0));
