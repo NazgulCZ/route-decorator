@@ -58,7 +58,12 @@ public class GeometryUtils {
         double projLon = segmentStart.getLongitude() + t * dx;
         double projLat = segmentStart.getLatitude() + t * dy;
 
-        return new Point(projLat, projLon);
+        return new Point(projLat, projLon, centerElevationPlaceholder());
+    }
+
+    // placeholder helper — the Point constructor requires elevation; route points may be 2D in tests
+    private static double centerElevationPlaceholder() {
+        return 0.0;
     }
 
     public static List<Point> generateHexagon(Point center, double radiusInMeters) {
@@ -67,16 +72,18 @@ public class GeometryUtils {
             throw new IllegalArgumentException("Radius must be positive");
         }
 
-        List<Point> hexagon = new ArrayList<>();
+        final double METERS_PER_DEGREE_LAT = 111000.0; // meters per degree latitude
+        double radiusDegLat = radiusInMeters / METERS_PER_DEGREE_LAT;
+        double radiusDegLonFactor = 1.0 / (METERS_PER_DEGREE_LAT * Math.cos(Math.toRadians(center.getLatitude())));
 
-        double radiusInDegreesLat = radiusInMeters / 111000.0;
-        double radiusInDegreesLon = radiusInDegreesLat / Math.cos(Math.toRadians(center.getLatitude()));
+        List<Point> hexagon = new ArrayList<>(6);
 
         for (int i = 0; i < 6; i++) {
-            double angle = (i * 60) * Math.PI / 180.0;
+            double angleDeg = 90.0 - i * 60.0; // start at north and go clockwise
+            double angleRad = Math.toRadians(angleDeg);
 
-            double offsetLat = radiusInDegreesLat * Math.cos(angle);
-            double offsetLon = radiusInDegreesLon * Math.sin(angle);
+            double offsetLat = radiusDegLat * Math.cos(angleRad);
+            double offsetLon = radiusInMeters * Math.sin(angleRad) * radiusDegLonFactor;
 
             double lat = center.getLatitude() + offsetLat;
             double lon = center.getLongitude() + offsetLon;
