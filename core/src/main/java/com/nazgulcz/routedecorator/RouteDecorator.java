@@ -21,10 +21,10 @@ public class RouteDecorator {
     private double polygonRadiusInMeters;
 
     /**
-     * Create a RouteDecorator with default polygon radius of 20 meters.
+     * Create a RouteDecorator with default polygon radius of 100 meters.
      */
     public RouteDecorator() {
-        this(20.0);
+        this(100.0);
     }
 
     /**
@@ -62,47 +62,56 @@ public class RouteDecorator {
 
     /**
      * Add a hexagon around a waypoint to the route at the appropriate position.
+     *
+     * The insertion sequence is 8 points:
+     *  1) connector from center (route point closest to waypoint) toward the first hex vertex
+     *  2) six hexagon vertices (in generator order)
+     *  3) connector back to the center (the center point)
      */
     private void addHexagonToRoute(Route route, Waypoint waypoint) {
-        Point nearestPointOnRoute = GeometryUtils.findNearestPointOnPolyline(
-                waypoint.getPoint(),
-                route.getPoints()
-        );
+        // Find the route point closest to the waypoint - this is the polygon center on the route
+        int centerIndex = findClosestRoutePointIndex(route.getPoints(), waypoint.getPoint());
+        Point center = route.getPoints().get(centerIndex);
 
-        // Find the index where the hexagon should be inserted
-        int insertionIndex = findInsertionIndex(route.getPoints(), nearestPointOnRoute, waypoint.getPoint());
+        // Generate hexagon around the center point (must return exactly 6 vertices)
+        List<Point> hexagonPoints = GeometryUtils.generateHexagon(center, polygonRadiusInMeters);
 
-        List<Point> hexagonPoints = GeometryUtils.generateHexagon(nearestPointOnRoute, polygonRadiusInMeters);
-        
-        // Insert hexagon points at the correct position
-        for (int i = 0; i < hexagonPoints.size(); i++) {
-            route.getPoints().add(insertionIndex + i, hexagonPoints.get(i));
+        // First connector: midpoint from center to first hex vertex
+        Point firstConnector = hexagonPoints.get(5);// midpoint(center, firstVertex);
+
+        // Last connector: return to the center point (duplicate of center)
+        Point lastConnector = center;//new Point(center.getLatitude(), center.getLongitude(), center.getElevation());
+
+        // Build insertion list: 1 connector + 6 hex vertices + 1 connector back
+        List<Point> toInsert = new ArrayList<>(8);
+        toInsert.add(firstConnector);
+        toInsert.addAll(hexagonPoints);
+        toInsert.add(lastConnector);
+
+        // Insert after the center index so the polygon branches out from the route at the center point
+        int insertionIndex = Math.min(route.getPoints().size(), centerIndex + 1);
+        for (int i = 0; i < toInsert.size(); i++) {
+            route.getPoints().add(insertionIndex + i, toInsert.get(i));
         }
     }
 
-    /**
-     * Find the index in the route where the hexagon should be inserted.
-     * The hexagon is inserted after the segment that contains the nearest point.
-     */
-    private int findInsertionIndex(List<Point> routePoints, Point nearestPoint, Point waypoint) {
+    private int findClosestRoutePointIndex(List<Point> routePoints, Point waypoint) {
         double minDistance = Double.MAX_VALUE;
-        int segmentIndex = 0;
-
-        // Find which segment the nearest point is closest to
-        for (int i = 0; i < routePoints.size() - 1; i++) {
-            Point segmentStart = routePoints.get(i);
-            Point segmentEnd = routePoints.get(i + 1);
-
-            Point closestPointOnSegment = GeometryUtils.findNearestPointOnSegment(waypoint, segmentStart, segmentEnd);
-            double distance = waypoint.distanceTo(closestPointOnSegment);
-
-            if (distance < minDistance) {
-                minDistance = distance;
-                segmentIndex = i;
+        int bestIndex = 0;
+        for (int i = 0; i < routePoints.size(); i++) {
+            double d = waypoint.distanceTo(routePoints.get(i));
+            if (d < minDistance) {
+                minDistance = d;
+                bestIndex = i;
             }
         }
+        return bestIndex;
+    }
 
-        // Insert after the end of the segment
-        return segmentIndex + 1;
+    private Point midpoint(Point a, Point b) {
+        double lat = (a.getLatitude() + b.getLatitude()) / 2.0;
+        double lon = (a.getLongitude() + b.getLongitude()) / 2.0;
+        double ele = (a.getElevation() + b.getElevation()) / 2.0;
+        return new Point(lat, lon, ele);
     }
 }
