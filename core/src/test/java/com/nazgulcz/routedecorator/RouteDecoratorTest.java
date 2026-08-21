@@ -27,8 +27,8 @@ class RouteDecoratorTest {
         RouteDecorator decorator = new RouteDecorator(10.0);
         Route decoratedRoute = decorator.decorate(route, waypoints);
 
-        // Original route had 3 points, hexagon adds 6 more = 9 total
-        assertEquals(9, decoratedRoute.getPointCount());
+        // Original route had 3 points, hexagon adds 8 more = 11 total
+        assertEquals(11, decoratedRoute.getPointCount());
         assertEquals("Test Route", decoratedRoute.getName());
     }
 
@@ -42,13 +42,13 @@ class RouteDecoratorTest {
         Route route = new Route(routePoints);
 
         Waypoint waypoint = new Waypoint("Waypoint 1", new Point(1, 5));
-        List<Waypoint> waypoints = Arrays.asList(waypoint);
+        List<Waypoint> waypoints = List.of(waypoint);
 
         RouteDecorator decorator = new RouteDecorator(10.0);
         Route decoratedRoute = decorator.decorate(route, waypoints);
 
         assertNull(decoratedRoute.getName());
-        assertEquals(9, decoratedRoute.getPointCount());
+        assertEquals(11, decoratedRoute.getPointCount());
     }
 
     @Test
@@ -68,8 +68,8 @@ class RouteDecoratorTest {
         RouteDecorator decorator = new RouteDecorator(10.0);
         Route decoratedRoute = decorator.decorate(route, waypoints);
 
-        // 3 original + 6 for first waypoint + 6 for second waypoint = 15
-        assertEquals(15, decoratedRoute.getPointCount());
+        // 3 original + 8 for first waypoint + 8 for second waypoint = 19
+        assertEquals(19, decoratedRoute.getPointCount());
     }
 
     @Test

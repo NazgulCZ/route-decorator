@@ -76,16 +76,11 @@ public class RouteDecorator {
         // Generate hexagon around the center point (must return exactly 6 vertices)
         List<Point> hexagonPoints = GeometryUtils.generateHexagon(center, polygonRadiusInMeters);
 
-        if (hexagonPoints == null || hexagonPoints.isEmpty()) {
-            return;
-        }
-
         // First connector: midpoint from center to first hex vertex
-        Point firstVertex = hexagonPoints.get(0);
-        Point firstConnector = midpoint(center, firstVertex);
+        Point firstConnector = hexagonPoints.get(5);// midpoint(center, firstVertex);
 
         // Last connector: return to the center point (duplicate of center)
-        Point lastConnector = new Point(center.getLatitude(), center.getLongitude(), center.getElevation());
+        Point lastConnector = center;//new Point(center.getLatitude(), center.getLongitude(), center.getElevation());
 
         // Build insertion list: 1 connector + 6 hex vertices + 1 connector back
         List<Point> toInsert = new ArrayList<>(8);
