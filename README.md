@@ -1,6 +1,6 @@
 # route-decorator
 
-A tiny command-line tool that decorates GPX routes by drawing small polygon markers (regular hexagons) around waypoint locations so they remain visible in map viewers.
+A command-line tool that decorates GPX routes by drawing small polygon markers (regular hexagons) around waypoint locations so they remain visible in map viewers.
 
 Important requirement
 - Java 25 (JDK 25) is required to run the prebuilt JAR.
@@ -10,21 +10,21 @@ Download the prebuilt JAR
 
 Quick usage
 - Run the tool with Java 25:
-
+```
   java -jar route-decorator-<version>.jar \
     --route-file path/to/route.gpx \
     --waypoint-file path/to/waypoints.gpx \
     --output-file path/to/decorated.gpx \
     [--radius <meters>]
-
+```
 Required options
 - `--route-file`, `-rf`   Path to the GPX file containing the route or track to decorate
 - `--waypoint-file`, `-wf` Path to the GPX file containing waypoints
 - `--output-file`, `-of`  Path to write the decorated GPX output
 
 Optional
-- `--radius`            Radius of the hexagon in meters (default: 20.0)
-- `--waypoints`, `-w`   Optional waypoint selection string (if supported)
+- `--radius`            Radius of the hexagon in meters (default: 100)
+- `--waypoints`, `-w`   Optional waypoint selection string, e. g. 1,3,5,7-10
 
 What the tool does
 - For each waypoint the tool:
@@ -36,7 +36,6 @@ What the tool does
 Troubleshooting
 - "Unsupported major.minor version" or similar: install JDK 25 and run with the `java` from that JDK.
 - "File not found": check file paths and permissions.
-- Hexagons not visible in your map viewer: some viewers collapse very short branches or hide dense point clusters — try increasing `--radius` to make the polygon larger, or open the output GPX in a text editor to confirm the inserted points are present.
 
 Help / issues
 - If you encounter a problem with the prebuilt JAR or the decorated GPX output, open an issue on the project repository: https://github.com/NazgulCZ/route-decorator/issues
