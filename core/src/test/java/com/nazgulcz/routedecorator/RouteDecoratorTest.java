@@ -82,12 +82,6 @@ class RouteDecoratorTest {
     }
 
     @Test
-    void failingTest() {
-        fail("This test is failing intentionally to test github actions");
-        // blah blah
-    }
-
-    @Test
     void testInvalidPolygonRadius() {
         assertThrows(IllegalArgumentException.class, () -> new RouteDecorator(-5.0));
         assertThrows(IllegalArgumentException.class, () -> new RouteDecorator(0.0));
