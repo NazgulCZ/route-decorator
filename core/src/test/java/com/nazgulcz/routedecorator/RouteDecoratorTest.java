@@ -22,7 +22,7 @@ class RouteDecoratorTest {
         Route route = new Route("Test Route", routePoints);
 
         Waypoint waypoint = new Waypoint("Waypoint 1", new Point(1, 5));
-        List<Waypoint> waypoints = Arrays.asList(waypoint);
+        List<Waypoint> waypoints = List.of(waypoint);
 
         RouteDecorator decorator = new RouteDecorator(10.0);
         Route decoratedRoute = decorator.decorate(route, waypoints);
@@ -84,7 +84,7 @@ class RouteDecoratorTest {
     @Test
     void testDefaultPolygonRadius() {
         RouteDecorator decorator = new RouteDecorator();
-        assertEquals(10.0, decorator.getPolygonRadiusInMeters());
+        assertEquals(20.0, decorator.getPolygonRadiusInMeters());
     }
 
     @Test

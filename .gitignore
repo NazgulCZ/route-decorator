@@ -41,3 +41,9 @@ replay_pid*
 build
 core/build
 cli/build
+/.gradle/9.3.0/expanded/expanded.lock
+/.junie/memory/errors.md
+/.junie/memory/feedback.md
+/.junie/memory/language.json
+/.junie/memory/memory.version
+/.junie/memory/tasks.md
