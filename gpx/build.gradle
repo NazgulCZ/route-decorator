@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.nazgulcz'
+version = '4.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+}
+
+dependencies {
+    implementation project(':core')
+
+    compileOnly 'org.projectlombok:lombok:1.18.46'
+    annotationProcessor 'org.projectlombok:lombok:1.18.46'
+
+    // JAXB for XML parsing
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+    runtimeOnly 'com.sun.xml.bind:jaxb-impl:4.0.2'
+
+    // JUnit 6 for testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:6.1.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:6.1.0'
+}
+
+
+test {
+    useJUnitPlatform()
+}
