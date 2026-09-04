@@ -1,13 +1,9 @@
 package com.nazgulcz.routedecorator.cli;
 
-import com.nazgulcz.routedecorator.gpx.GpxWriter;
-import com.nazgulcz.routedecorator.model.Point;
+import com.nazgulcz.routedecorator.gpx.GpxException;
 import com.nazgulcz.routedecorator.model.Route;
-import jakarta.xml.bind.JAXBException;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Writes decorated routes back to GPX format (CLI adapter).
@@ -26,11 +22,10 @@ public class GpxWriter {
      */
     public static void write(Route route, Path outputPath) throws CliException {
         try {
-            GpxWriter.write(route, outputPath);
-        } catch (Exception e) {
+            // Delegate to the shared gpx module writer
+            com.nazgulcz.routedecorator.gpx.GpxWriter.write(route, outputPath);
+        } catch (GpxException e) {
             throw new CliException("Failed to write output file: " + e.getMessage(), e);
         }
     }
-
-    // kept the original conversion logic previously used by the old writer is now performed inside gpx.GpxWriter
 }
