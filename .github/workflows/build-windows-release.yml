@@ -1,0 +1,66 @@
+name: Build Windows Release
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Build fat JAR
+        run: .\gradlew.bat :cli:fatJar --no-daemon
+
+      - name: Prepare dist folder and zip
+        shell: powershell
+        run: |
+          $tag = "${{ github.event.release.tag_name }}"
+          Write-Host "Release tag: $tag"
+
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+
+          $jar = Get-ChildItem -Path cli\build\libs -Filter 'route-decorator-*.jar' | Select-Object -First 1
+          if (-not $jar) {
+            Write-Error "Could not find built jar in cli\build\libs"
+            exit 1
+          }
+
+          Copy-Item $jar.FullName -Destination "dist\route-decorator-$tag.jar"
+
+          $bat = "@echo off`r`njava -jar `"%~dp0route-decorator-$tag.jar`" %*`r`n"
+          Set-Content -Path dist\run.bat -Value $bat -Encoding ASCII
+
+          if (Test-Path README.md) {
+            Copy-Item README.md dist\
+          }
+
+          $zipName = "route-decorator-windows-$tag.zip"
+          if (Test-Path $zipName) {
+            Remove-Item $zipName
+          }
+
+          Compress-Archive -Path dist\* -DestinationPath $zipName -Force
+          Write-Host "Created $zipName"
+
+      - name: Upload ZIP to release
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.event.release.tag_name }}"
+          $zipName = "route-decorator-windows-$tag.zip"
+          gh release upload $tag $zipName --clobber
