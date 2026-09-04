@@ -1,2 +1,2 @@
 rootProject.name = 'route-decorator'
-include 'core', 'cli'
+include 'core', 'cli', 'gpx', 'rest'
