@@ -1,0 +1,25 @@
+package com.nazgulcz.routedecorator.gpx;
+
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+/**
+ * JAXB model for a GPX route (rte).
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@XmlAccessorType(XmlAccessType.FIELD)
+public class GpxRoute {
+    @XmlElement
+    private String name;
+
+    @XmlElement(name = "rtept")
+    private List<GpxPoint> points;
+}
