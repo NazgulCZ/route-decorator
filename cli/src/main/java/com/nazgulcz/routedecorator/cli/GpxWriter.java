@@ -1,18 +1,16 @@
 package com.nazgulcz.routedecorator.cli;
 
-import com.nazgulcz.routedecorator.cli.gpx.*;
+import com.nazgulcz.routedecorator.gpx.GpxWriter;
 import com.nazgulcz.routedecorator.model.Point;
 import com.nazgulcz.routedecorator.model.Route;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Writes decorated routes back to GPX format.
+ * Writes decorated routes back to GPX format (CLI adapter).
  */
 public class GpxWriter {
 
@@ -28,35 +26,11 @@ public class GpxWriter {
      */
     public static void write(Route route, Path outputPath) throws CliException {
         try {
-            GpxRoute gpxRoute = convertRoute(route);
-            GpxDocument doc = new GpxDocument();
-            doc.setRoutes(List.of(gpxRoute));
-
-            JAXBContext context = JAXBContext.newInstance(GpxDocument.class);
-            Marshaller marshaller = context.createMarshaller();
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            marshaller.marshal(doc, outputPath.toFile());
-        } catch (JAXBException e) {
+            GpxWriter.write(route, outputPath);
+        } catch (Exception e) {
             throw new CliException("Failed to write output file: " + e.getMessage(), e);
         }
     }
 
-    private static GpxRoute convertRoute(Route route) {
-        GpxRoute gpxRoute = new GpxRoute();
-        gpxRoute.setName(route.getName());
-
-        List<GpxPoint> gpxPoints = new ArrayList<>();
-        for (Point point : route.getPoints()) {
-            GpxPoint gpxPoint = new GpxPoint();
-            gpxPoint.setLat(point.getLatitude());
-            gpxPoint.setLon(point.getLongitude());
-            if (point.getElevation() != 0.0) {
-                gpxPoint.setEle(point.getElevation());
-            }
-            gpxPoints.add(gpxPoint);
-        }
-
-        gpxRoute.setPoints(gpxPoints);
-        return gpxRoute;
-    }
+    // kept the original conversion logic previously used by the old writer is now performed inside gpx.GpxWriter
 }
