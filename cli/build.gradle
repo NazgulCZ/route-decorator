@@ -17,6 +17,7 @@ java {
 
 dependencies {
     implementation project(':core')
+    implementation project(':gpx')
 
     compileOnly 'org.projectlombok:lombok:1.18.46'
     annotationProcessor 'org.projectlombok:lombok:1.18.46'
